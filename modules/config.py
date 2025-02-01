@@ -1,0 +1,20 @@
+# Configuration
+CONFIG = {
+    "service_account_path": "./config/service_account.json",
+    "calendars_csv_path": "./config/calendars.csv",
+    "output_dir": "./calendars",
+    "database_path": "../events.sqlite",
+    "DB_FILE": "../events.sqlite",
+    "TEMPLATE_FILE": "./activity_template.md",
+    "TEMPLATE_ACTIVITIES_BLOCK": "./activities_block_template.md",
+    "activity_block_keywords_csv_path": "./config/activity_block_keywords.csv",
+    "activity_category_keywords_csv_path": "./config/activity_category_keywords.csv",
+    "combined_csv_path": "./calendars/combined/combined_events.csv",
+    "OUTPUT_JOURNALS_DIR": "../journals",
+    "OUTPUT_ACTIVITIES_DIR": "../activity",
+    "LOG_DIR": "./logs",
+    "LOG_FILE": "sync_events.md",
+    "block_keywords_csv_path": "./config/activity_block_keywords.csv",
+    "category_keywords_csv_path": "./config/activity_category_keywords.csv",
+    "combined_csv_path": "./calendars/combined/combined_events.csv",
+}

@@ -1,0 +1,18 @@
+[project]
+name = "gcal2md"
+version = "0.1.0"
+description = "Sync Google Calendar to SQLite and create event to markdown and organize daily activities in daily notes"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "config>=0.5.1",
+    "google-api-python-client>=2.160.0",
+    "google-auth>=2.38.0",
+    "google-auth-httplib2>=0.2.0",
+    "google-auth-oauthlib>=1.2.1",
+    "jinja2>=3.1.5",
+    "pandas>=2.2.3",
+    "pytz>=2025.1",
+    "typer>=0.15.1",
+    "tzlocal>=5.2",
+]
