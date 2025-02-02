@@ -162,16 +162,21 @@ def calculate_duration(event, unit="minutes"):
     return duration / 60 if unit == "minutes" else duration / 3600
 
 
-def save_events_to_db(events, database_path):
+def save_events_to_db(events, database_path, update_columns=None):
     """
-    Save events to an SQLite database. Update events if they already exist.
+    Save events to an SQLite database. Insert new events or update only specified columns.
+    
+    Parameters:
+    - events: List of event dictionaries
+    - database_path: Path to the SQLite database
+    - update_columns: List of columns to update (default: None, meaning all columns)
     """
     conn = sqlite3.connect(database_path)
     cursor = conn.cursor()
-    
+
     logging.info(f"Saving {len(events)} events to the database...")
-    
-    # Create table with Event_ID as the primary key
+
+    # Ensure the events table exists
     cursor.execute(
         """
         CREATE TABLE IF NOT EXISTS events (
@@ -193,34 +198,39 @@ def save_events_to_db(events, database_path):
         """
     )
 
-    # Insert or replace events into the table
+    # Define default columns to update if none are provided
+    default_columns = [
+        "calendar_name", "calendar_id", "summary", "description",
+        "start", "end", "start_date", "end_date",
+        "duration_minutes", "duration_hours", "timezone",
+        "offsite", "location"
+    ]
+    update_columns = update_columns or default_columns
+
     for event in events:
-        logging.info(f"Inserting event {event['Event ID']} - {event['Summary']}")
-        cursor.execute(
-            """
-            INSERT OR REPLACE INTO events (
-                event_id, calendar_name, calendar_id, summary, description, start, end,
-                start_date, end_date, duration_minutes, duration_hours, timezone, offsite, location
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-            (
-                event["Event ID"],
-                event["Calendar Name"],
-                event["Calendar ID"],
-                event["Summary"],
-                event["Description"],
-                event["Start"],
-                event["End"],
-                event["Start Date"],
-                event["End Date"],
-                event["Duration_Minutes"],
-                event["Duration_Hours"],
-                event["Timezone"],
-                event["Offsite"],  # Store offset as a string
-                event["Location"],
-            ),
-        )
+        event_id = event["Event ID"]
+        cursor.execute("SELECT * FROM events WHERE event_id = ?", (event_id,))
+        existing_event = cursor.fetchone()
+
+        if existing_event:
+            # If event exists, update only specified columns
+            set_clause = ", ".join([f"{col} = ?" for col in update_columns])
+            values = [event[col.replace("_", " ").title()] for col in update_columns]
+            values.append(event_id)
+
+            update_query = f"UPDATE events SET {set_clause} WHERE event_id = ?"
+            cursor.execute(update_query, values)
+            logging.info(f"Updated event {event_id}")
+        else:
+            # If event does not exist, insert it
+            columns = ["event_id"] + update_columns
+            placeholders = ", ".join(["?"] * len(columns))
+            insert_query = f"INSERT INTO events ({', '.join(columns)}) VALUES ({placeholders})"
+            values = [event["Event ID"]] + [event[col.replace("_", " ").title()] for col in update_columns]
+            cursor.execute(insert_query, values)
+            logging.info(f"Inserted event {event_id}")
 
     conn.commit()
     conn.close()
-    logging.info(f"Events synchronized to database at {database_path}")
+    logging.info("Events synchronized to the database.")
+
