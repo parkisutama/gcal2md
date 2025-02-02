@@ -1,5 +1,6 @@
 import datetime
 import typer
+import logging
 from dateutil.relativedelta import relativedelta
 from modules.config import CONFIG
 from modules.activity_generator import MarkdownSyncGenerator
@@ -27,6 +28,7 @@ generator = MarkdownSyncGenerator(
     },
 )
 
+# Get Date Range from User Option
 def get_date_range(option: str):
     today = datetime.date.today()
     if option == "today":
@@ -49,7 +51,6 @@ def get_date_range(option: str):
 @app.command()
 def sync(option: str = typer.Argument("today", help="Sync events and generate markdown for today, week, month, or year"), start: str = None, end: str = None):
     """Fetch events from Google Calendar, store them in the database, and generate/update Markdown files for a specified date range."""
-    import logging
     
     if start and end:
         try:
@@ -75,7 +76,7 @@ def sync(option: str = typer.Argument("today", help="Sync events and generate ma
         end_date=end_date,
     )
     logging.info("Updating existing Markdown files...")
-    sync_journals(CONFIG["TEMPLATE_ACTIVITIES_BLOCK"], CONFIG["DB_FILE"], start_date, end_date)
+    sync_journals(CONFIG["TEMPLATE_ACTIVITIES_BLOCK"], CONFIG["DB_FILE"],CONFIG["DB_TABLE_NAME"], start_date, end_date)
     logging.info(
         "Sync completed: Events fetched, Markdown generated and updated for the specified date range."
     )

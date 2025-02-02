@@ -27,13 +27,14 @@ def load_template(template_activities_block):
 
 
 # Fetch events from the database
-def fetch_events(db_file, date):
+def fetch_events(db_file, table_name, date):
     conn = sqlite3.connect(db_file)
     cursor = conn.cursor()
 
-    query = """
+    # Use f-string to safely format table name
+    query = f"""
     SELECT event_id, start_date, end_date, summary
-    FROM events
+    FROM "{table_name}"
     WHERE DATE(start_date) = ?
     ORDER BY start_date;
     """
@@ -42,6 +43,7 @@ def fetch_events(db_file, date):
     rows = cursor.fetchall()
     conn.close()
     return rows
+
 
 
 # Safely extract and parse frontmatter
@@ -140,23 +142,14 @@ def update_journal(template, date, events):
 
 
 # Sync the journal files with the database
-def sync_journals(template_activities_block, db_file, start_date: str, end_date: str):
-    """
-    Sync the journal files with the database, but only for the specified date range.
-
-    Args:
-        template_activities_block (str): Path to the Markdown template file.
-        db_file (str): Path to the SQLite database file.
-        start_date (str): Start date (YYYY-MM-DD).
-        end_date (str): End date (YYYY-MM-DD).
-    """
+def sync_journals(template_activities_block, db_file, table_name, start_date: str, end_date: str):
     template = load_template(template_activities_block)
 
     conn = sqlite3.connect(db_file)
     cursor = conn.cursor()
 
-    query = """
-    SELECT DISTINCT DATE(start_date) FROM events
+    query = f"""
+    SELECT DISTINCT DATE(start_date) FROM "{table_name}"
     WHERE DATE(start_date) BETWEEN ? AND ?
     ORDER BY DATE(start_date);
     """
@@ -165,9 +158,6 @@ def sync_journals(template_activities_block, db_file, start_date: str, end_date:
     conn.close()
 
     for date in dates:
-        events = fetch_events(db_file, date)
+        events = fetch_events(db_file, table_name, date)  # Pass table_name correctly
         update_journal(template, date, events)
 
-
-if __name__ == "__main__":
-    sync_journals(CONFIG["TEMPLATE_ACTIVITIES_BLOCK"], CONFIG["DB_FILE"])
