@@ -5,6 +5,7 @@ CONFIG = {
     "output_dir": "./calendars",
     "database_path": "../events.sqlite",
     "DB_FILE": "../events.sqlite",
+    "DB_TABLE_NAME": "events",
     "TEMPLATE_FILE": "./activity_template.md",
     "TEMPLATE_ACTIVITIES_BLOCK": "./activities_block_template.md",
     "activity_block_keywords_csv_path": "./config/activity_block_keywords.csv",
@@ -17,4 +18,13 @@ CONFIG = {
     "block_keywords_csv_path": "./config/activity_block_keywords.csv",
     "category_keywords_csv_path": "./config/activity_category_keywords.csv",
     "combined_csv_path": "./calendars/combined/combined_events.csv",
+    "ALLOWED_FRONTMATTER_FIELDS": ["title", "activity_block", "activity_category","persona", "feeling", "feeling_intensity"],
+    "FRONTMATTER_TO_DB_MAPPING": {
+        "title": "summary",
+        "activity_block": "activity_block",
+        "activity_category": "activity_category",
+        "persona": "persona",
+        "feeling": "feeling",
+        "feeling_intensity": "feeling_intensity",
+    }
 }

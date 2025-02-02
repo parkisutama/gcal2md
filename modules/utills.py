@@ -16,20 +16,25 @@ def create_table():
     cursor.execute(
         """
     CREATE TABLE IF NOT EXISTS events (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        event_id TEXT PRIMARY KEY UNIQUE,
         calendar_name TEXT,
         calendar_id TEXT,
-        event_id TEXT UNIQUE,
         summary TEXT,
         description TEXT,
         start TEXT,
         end TEXT,
-        duration_minutes INTEGER,
+        start_date TEXT,
+        end_date TEXT,
+        duration_minutes REAL,
         duration_hours REAL,
+        timezone TEXT,
+        offsite TEXT,
         location TEXT,
         activity_block TEXT,
         activity_category TEXT,
-        persona TEXT
+        persona TEXT,
+        feeling TEXT,
+        feeling_intensity INTEGER,
     );
     """
     )
