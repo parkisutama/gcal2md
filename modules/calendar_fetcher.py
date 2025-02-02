@@ -207,15 +207,32 @@ def save_events_to_db(events, database_path, update_columns=None):
     ]
     update_columns = update_columns or default_columns
 
+    # Mapping dictionary to match event dictionary keys with database column names
+    column_mapping = {
+        "calendar_name": "Calendar Name",
+        "calendar_id": "Calendar ID",
+        "summary": "Summary",
+        "description": "Description",
+        "start": "Start",
+        "end": "End",
+        "start_date": "Start Date",
+        "end_date": "End Date",
+        "duration_minutes": "Duration_Minutes",
+        "duration_hours": "Duration_Hours",
+        "timezone": "Timezone",
+        "offsite": "Offsite",
+        "location": "Location",
+    }
+
     for event in events:
-        event_id = event["Event ID"]
+        event_id = event.get("Event ID", "")
         cursor.execute("SELECT * FROM events WHERE event_id = ?", (event_id,))
         existing_event = cursor.fetchone()
 
         if existing_event:
             # If event exists, update only specified columns
             set_clause = ", ".join([f"{col} = ?" for col in update_columns])
-            values = [event[col.replace("_", " ").title()] for col in update_columns]
+            values = [event.get(column_mapping[col], "") for col in update_columns]
             values.append(event_id)
 
             update_query = f"UPDATE events SET {set_clause} WHERE event_id = ?"
@@ -226,7 +243,7 @@ def save_events_to_db(events, database_path, update_columns=None):
             columns = ["event_id"] + update_columns
             placeholders = ", ".join(["?"] * len(columns))
             insert_query = f"INSERT INTO events ({', '.join(columns)}) VALUES ({placeholders})"
-            values = [event["Event ID"]] + [event[col.replace("_", " ").title()] for col in update_columns]
+            values = [event.get("Event ID", "")] + [event.get(column_mapping[col], "") for col in update_columns]
             cursor.execute(insert_query, values)
             logging.info(f"Inserted event {event_id}")
 
