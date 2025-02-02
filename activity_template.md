@@ -6,15 +6,21 @@ duration-minutes: {{duration_minutes}}
 activity-block: {{activity_block}}
 activity-category: {{activity_category}}
 persona: {{persona}}
+feeling: {{feeling}}
+feeling_intensity: {{feeling_intensity}}
 tags:
 ---
 
 # {{summary}}
 
-## general notes
+## Emotional state
 
-## interaction
+## Physical state
 
-## decision i made
+## What Happened
 
-## decision i could have made
+## What I Learned
+
+## What I Will Do Differently Next Time
+
+## To Do
